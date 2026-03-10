@@ -4,7 +4,8 @@ FastAPI 后端服务 - LangChain 1.0+
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 import os
@@ -52,6 +53,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ========== 静态文件托管（前端页面）==========
+# 获取前端目录路径
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(os.path.dirname(BACKEND_DIR), "frontend")
+
+# 检查前端目录是否存在
+if os.path.exists(FRONTEND_DIR):
+    # 挂载静态文件
+    app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
+    print(f"✅ 前端静态文件已挂载: {FRONTEND_DIR}")
+else:
+    print(f"⚠️ 前端目录不存在: {FRONTEND_DIR}")
+
 
 # ========== 启动事件 ==========
 @app.on_event("startup")
@@ -76,7 +90,8 @@ async def startup_event():
     
     print("✅ 服务启动完成！")
     print(f"📡 API文档: http://localhost:{config.APP_PORT}/docs")
-    print(f"👨‍💼 管理后台: http://localhost:{config.APP_PORT}/../frontend/admin/login.html")
+    print(f"🏠 前端首页: http://localhost:{config.APP_PORT}/")
+    print(f"👨‍💼 管理后台: http://localhost:{config.APP_PORT}/static/admin/login.html")
     print("=" * 60 + "\n")
 
 
@@ -113,16 +128,20 @@ async def init_default_admin():
 
 
 # ========== 健康检查 ==========
-@app.get("/")
-async def root():
-    """健康检查"""
-    return {"status": "ok", "message": "老年人智能助手服务运行中"}
-
-
 @app.get("/health")
 async def health_check():
     """健康检查"""
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+
+
+@app.get("/")
+async def root():
+    """根路由 - 重定向到前端页面"""
+    # 如果前端目录存在，重定向到前端首页
+    if os.path.exists(FRONTEND_DIR):
+        return RedirectResponse(url="/static/index.html")
+    # 否则返回 API 状态
+    return {"status": "ok", "message": "老年人智能助手服务运行中", "docs": "/docs"}
 
 
 @app.post("/api/admin/trigger-reminders")
