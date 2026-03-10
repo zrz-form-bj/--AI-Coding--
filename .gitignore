@@ -1,0 +1,12 @@
+# 排除环境变量文件（含密钥）
+backend/.env
+backend/.env.example
+# 排除IDE配置文件（可选，减少冗余）
+.idea/
+# 排除Python依赖缓存
+__pycache__/
+*.pyc
+# 排除数据库文件（如果有）
+*.db
+提交的文件
+我的想法.txt

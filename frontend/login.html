@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老年智能助手 - 登录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-size: 18px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: "Microsoft YaHei", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .error-msg {
+            background: #fff3f3;
+            color: #dc3545;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success-msg {
+            background: #f0fff4;
+            color: #28a745;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .toggle-text a {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .connection-status.online {
+            background: #28a745;
+        }
+        
+        .connection-status.offline {
+            background: #dc3545;
+        }
+        
+        /* 注册表单默认隐藏 */
+        #registerForm {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status online" id="connectionStatus">已连接</div>
+    
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>👴 老年智能助手</h1>
+                <p>请登录或注册以使用服务</p>
+            </div>
+            
+            <!-- 登录表单 -->
+            <div id="loginForm">
+                <div class="error-msg" id="loginError"></div>
+                
+                <div class="form-group">
+                    <label for="loginUsername">用户名</label>
+                    <input type="text" id="loginUsername" placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">密码</label>
+                    <input type="password" id="loginPassword" placeholder="请输入密码">
+                </div>
+                
+                <button class="btn btn-primary" onclick="handleLogin()">登 录</button>
+                
+                <div class="toggle-text">
+                    还没有账号？<a onclick="showRegister()">立即注册</a>
+                </div>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div id="registerForm">
+                <div class="error-msg" id="registerError"></div>
+                <div class="success-msg" id="registerSuccess"></div>
+                
+                <div class="form-group">
+                    <label for="regUsername">用户名</label>
+                    <input type="text" id="regUsername" placeholder="请输入用户名（2-50字）">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">密码</label>
+                    <input type="password" id="regPassword" placeholder="请输入密码（至少6位）">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPhone">手机号</label>
+                    <input type="tel" id="regPhone" placeholder="请输入手机号">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">邮箱（用于接收提醒）</label>
+                    <input type="email" id="regEmail" placeholder="请输入邮箱地址">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regName">您的姓名</label>
+                    <input type="text" id="regName" placeholder="请输入您的姓名">
+                </div>
+                
+                <button class="btn btn-primary" onclick="handleRegister()">注 册</button>
+                <button class="btn btn-secondary" onclick="showLogin()">返回登录</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000';
+        
+        // 检查连接
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(3000)
+                });
+                if (response.ok) {
+                    document.getElementById('connectionStatus').textContent = '已连接';
+                    document.getElementById('connectionStatus').className = 'connection-status online';
+                    return true;
+                }
+            } catch (e) {
+                document.getElementById('connectionStatus').textContent = '未连接';
+                document.getElementById('connectionStatus').className = 'connection-status offline';
+            }
+            return false;
+        }
+        
+        // 切换到注册表单
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginError').style.display = 'none';
+        }
+        
+        // 切换到登录表单
+        function showLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerError').style.display = 'none';
+            document.getElementById('registerSuccess').style.display = 'none';
+        }
+        
+        // 显示错误
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+        
+        // 显示成功
+        function showSuccess(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.style.display = 'block';
+        }
+        
+        // 登录处理
+        async function handleLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showError('loginError', '请填写用户名和密码');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 保存登录信息到localStorage
+                    localStorage.setItem('userInfo', JSON.stringify(result.user));
+                    localStorage.setItem('elderlyId', result.elderly_id);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // 跳转到主页面
+                    window.location.href = 'index.html';
+                } else {
+                    showError('loginError', result.message);
+                }
+            } catch (e) {
+                showError('loginError', '网络错误，请检查服务器连接');
+            }
+        }
+        
+        // 注册处理
+        async function handleRegister() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('regPhone').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const name = document.getElementById('regName').value.trim();
+            
+            if (!username || !password || !phone || !name) {
+                showError('registerError', '请填写所有必填字段');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('registerError', '密码至少需要6位');
+                return;
+            }
+            
+            if (phone.length !== 11) {
+                showError('registerError', '请输入正确的手机号');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, phone, email, name })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess('registerSuccess', '注册成功！即将跳转...');
+                    document.getElementById('registerError').style.display = 'none';
+                    
+                    // 保存登录信息
+                    localStorage.setItem('userInfo', JSON.stringify(result.user));
+                    localStorage.setItem('elderlyId', result.elderly_id);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    // 延迟跳转
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showError('registerError', result.message);
+                }
+            } catch (e) {
+                showError('registerError', '网络错误，请检查服务器连接');
+            }
+        }
+        
+        // 回车键提交
+        document.getElementById('loginUsername').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        
+        // 初始化
+        checkConnection();
+        setInterval(checkConnection, 30000);
+        
+        // 如果已登录，直接跳转
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
